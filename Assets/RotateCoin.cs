@@ -13,7 +13,7 @@ public class RotateCoin : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(new Vector3(1, 0, 0), 0.5f);
+        transform.Rotate(new Vector3(1, 0, 0), 0.2f);
         
     }
 
