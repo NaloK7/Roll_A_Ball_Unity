@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class MoveBall : MonoBehaviour
@@ -17,7 +18,7 @@ public class MoveBall : MonoBehaviour
     public int score;
     public TMP_Text finish;
     public int maxCoins;
-    // public int speedBall;
+     public int speedBall;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,7 @@ public class MoveBall : MonoBehaviour
         score = 0;
         hitTime = 0.15f;
         initColor = GetComponent<MeshRenderer>().material.color;
+        speedBall = 15;
         isJumping = false;
         //Debug.Log(maxCoins);
 
@@ -40,19 +42,19 @@ public class MoveBall : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.UpArrow))  // avancer
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.forward * 2);
+            GetComponent<Rigidbody>().AddForce(Vector3.forward * speedBall);
         }
         if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow)) // gauche
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.left * 2);
+            GetComponent<Rigidbody>().AddForce(Vector3.left * speedBall);
         }
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))  // reculer
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.back * 2);
+            GetComponent<Rigidbody>().AddForce(Vector3.back * speedBall);
         }
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))  // droite
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.right * 2);
+            GetComponent<Rigidbody>().AddForce(Vector3.right * speedBall);
         }
         if (Input.GetKeyDown(KeyCode.Space) && !isJumping)  // sauter
         {
@@ -63,9 +65,7 @@ public class MoveBall : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        // ajouter un composant audio dans les coins
-        // GetComponent.audioSource.play()
-        //Debug.Log("Je passe par l�");
+
         if (other.gameObject.CompareTag("Floor")) // si rentre en collision avec le "Floor"
         {
             isJumping = false;
@@ -87,7 +87,7 @@ public class MoveBall : MonoBehaviour
             if (score >= maxCoins)
             {
                 allCoinSound.Play();
-                finish.text = "Finish";
+                //finish.text = "Finish";
                 Time.timeScale = 0;
             }
             else
