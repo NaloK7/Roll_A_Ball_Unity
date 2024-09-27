@@ -18,12 +18,15 @@ public class MoveBall : MonoBehaviour
     public int score;
     public TMP_Text finish;
     public int maxCoins;
-     public int speedBall;
+    public int speedBall;
+    private float timer = 0f; 
+    private bool timerStarted = false;
+    private GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        // speedBall = 2;
+        gameManager = FindObjectOfType<GameManager>();
         maxCoins = FindObjectsOfType<RotateCoin>().Length; // compte le nombre de cylinder by rotate func
         CoinSounds = GetComponents<AudioSource>();
         oneCoinSound = CoinSounds[0];
@@ -33,13 +36,27 @@ public class MoveBall : MonoBehaviour
         initColor = GetComponent<MeshRenderer>().material.color;
         speedBall = 15;
         isJumping = false;
-        //Debug.Log(maxCoins);
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Démarre le timer lors du premier mouvement de la balle
+        if (!timerStarted && (Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.UpArrow) ||
+                              Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow) ||
+                              Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
+                              Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)))
+        {
+            timerStarted = true;
+        }
+
+        // Met à jour le timer si le jeu a commencé
+        if (timerStarted)
+        {
+            timer += Time.deltaTime; // Ajoute le temps écoulé depuis le dernier frame
+            gameManager.timerText.text = timer.ToString("F2") + " s";
+        }
         if (Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.UpArrow))  // avancer
         {
             GetComponent<Rigidbody>().AddForce(Vector3.forward * speedBall);
@@ -86,13 +103,17 @@ public class MoveBall : MonoBehaviour
             txt.text = "Coins : " + score;
             if (score >= maxCoins)
             {
+                timerStarted = false;
                 allCoinSound.Play();
-                //finish.text = "Finish";
                 Time.timeScale = 0;
+                gameManager.isGameOver = true;
             }
             else
             {
-                oneCoinSound.Play();
+                if (!oneCoinSound.isPlaying)
+                {
+                    StartCoroutine(PlaySoundForDuration(oneCoinSound, 0.6f));
+                }
             }
 
 
@@ -104,5 +125,12 @@ public class MoveBall : MonoBehaviour
         yield return new WaitForSeconds(hitTime);
         gameObject.GetComponent<MeshRenderer>().material.color = initColor;
 
+    }
+
+    IEnumerator PlaySoundForDuration(AudioSource audioSource, float duration)
+    {
+        audioSource.Play(); // Commence la lecture du son
+        yield return new WaitForSeconds(duration); // Attend la durée spécifiée
+        audioSource.Stop(); // Arrête la lecture du son
     }
 }
